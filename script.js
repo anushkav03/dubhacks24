@@ -105,47 +105,6 @@ async function fetchParagraphFromLLM(selectedPrompt) {
     }
 }
 
-// Start recording with an option to end it
-// async function startRecording() {
-//     try {
-//         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-//         const mediaRecorder = new MediaRecorder(stream);
-//         mediaRecorder.start();
-
-//         // Display the end recording button
-//         const endRecordingButton = document.createElement('button');
-//         endRecordingButton.textContent = "End Recording";
-//         endRecordingButton.classList.add('record-button');
-//         endRecordingButton.onclick = () => stopRecording(mediaRecorder, endRecordingButton);
-//         chatBox.appendChild(endRecordingButton);  // Add the "End Recording" button
-
-//         // MediaRecorder event to handle when data is available (audio chunks)
-//         const audioChunks = [];
-//         mediaRecorder.ondataavailable = function(e) {
-//             audioChunks.push(e.data);
-//         };
-
-//     } catch (err) {
-//         console.error('Error accessing microphone:', err);
-//     }
-// }
-
-// // Function to stop recording
-// function stopRecording(mediaRecorder, endButton) {
-//     mediaRecorder.stop();  // Stop the recording
-
-//     // Once recording is stopped, remove the "End Recording" button from the chatbox
-//     endButton.remove();
-
-//     mediaRecorder.onstop = function() {
-//         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-//         // Handle the audioBlob here (e.g., send to server, save locally, etc.)
-//         console.log('Recording complete:', audioBlob);
-//     };
-
-//     // Provide feedback that the recording has been stopped
-//     updateChatBox('Bot', 'Recording has been stopped.');
-// }
 function startRecording() {
     navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
         const recorder = new MediaRecorder(stream);
@@ -234,3 +193,40 @@ function updateChatBox(sender, message) {
     chatBox.appendChild(messageDiv);
     chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the bottom
 }
+
+sendMessageButton.addEventListener('click', async () => {
+    const userMessage = messageInput.value.trim();  // Get the user input and trim any extra spaces
+
+    if (userMessage !== '') {
+        // Add the user's message to the chatbox
+        updateChatBox('User', userMessage);
+
+        // Send the message to the backend ("/postToClaude" FastAPI endpoint)
+        try {
+            const response = await fetch('http://127.0.0.1:8000/postToClaude', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: userMessage })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to send message to Claude.');
+            }
+
+            const data = await response.json();
+
+            // Assuming the response from the endpoint includes the bot's reply
+            updateChatBox('Claude', data.reply);
+        } catch (error) {
+            console.error('Error:', error);
+            updateChatBox('System', 'Error sending message. Please try again.');
+        }
+
+        // Clear the input field after sending the message
+        messageInput.value = '';
+    }
+});
+
+

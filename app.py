@@ -1,5 +1,8 @@
 from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Request, Depends
 from pydantic import BaseModel
+from fastapi.responses import JSONResponse
+from typing import List, Dict
 from llm import chatbot_with_memory  # Assuming this function sends requests to LLM (e.g., GPT)
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,7 +18,6 @@ app.add_middleware(
 
 class MessageRequest(BaseModel):
     message: str
-
 
 class PromptInput(BaseModel):
     prompt: str
@@ -77,6 +79,7 @@ async def generate_paragraph(request: PromptInput):
         return {"paragraph": response[0]}
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to generate paragraph from LLM")
+
 
 
 # Run the app using Uvicorn
