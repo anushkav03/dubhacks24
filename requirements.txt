@@ -1,0 +1,6 @@
+pydub
+librosa
+numpy
+fastdtw
+ffmpeg
+ffmpeg-downloader

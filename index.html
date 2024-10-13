@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT UI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Choose your adventure</h1>
+        
+        <!-- Chatbox for conversation -->
+        <div class="chat-box" id="chat-box"></div> 
+        
+        <!-- Input area for user messages -->
+        <div class="input-box">
+            <input id="user-input" type="text" placeholder="Are you ready?">
+            <button id="send-btn">Send</button> 
+        </div>
+
+        <!-- Section for the button group -->
+        <div class="button-group">
+            <button id="darkModeToggle">Mysterious Theme</button>
+            <button id="removedarkMode">Light Hearted Theme</button>
+        </div>
+
+        <!-- Section where prompt choices will appear -->
+        <div id="prompt-selection" class="prompt-selection hidden">
+            <p>Please choose one of the following prompts:</p>
+            <div id="prompt-buttons"></div>
+        </div>
+
+
+    </div>
+    <div id="statsModal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <h2>Performance Statistics</h2>
+          <p>Here are some stats about your performance:</p>
+          <!-- Add your actual statistics here -->
+          <p id="user-stats">Accuracy: 85%, Time Taken: 5 minutes, etc.</p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <!-- <script src="workflow.js"></script> -->
+
+
+</body>
+</html>
