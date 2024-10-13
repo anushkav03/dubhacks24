@@ -61,5 +61,3 @@ print(f"time: {time}")
 print(f"wpm: {wpm}")
     
 ## Trying CrisperWhisper
-crisper_whisper_result = adjust_pauses_for_hf_pipeline_output(hf_pipeline_output)
-print(crisper_whisper_result)

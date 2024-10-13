@@ -4,3 +4,6 @@ numpy
 fastdtw
 ffmpeg
 ffmpeg-downloader
+fastapi
+uvicorn
+boto3
