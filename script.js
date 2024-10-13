@@ -64,12 +64,18 @@ function displayPromptChoices(prompts) {
     });
 }
 
+function expandChatBox() {
+    const chatBox = document.getElementById('chat-box');
+    chatBox.style.height = '600px';  // Adjust this value as needed for desired height
+}
+
 // Function to handle prompt selection by the user
 async function handlePromptSelection(selectedPrompt) {
     updateChatBox('User', `: ${selectedPrompt}`);
 
     // Hide the prompt selection area after a prompt is selected
     promptSelectionDiv.classList.add('hidden');
+    expandChatBox();
 
     // Send the selected prompt to LLM to generate a paragraph
     const paragraph = await fetchParagraphFromLLM(selectedPrompt);
@@ -168,7 +174,8 @@ function updateChatBox(sender, message) {
 
     const senderSpan = document.createElement('span');
     senderSpan.classList.add('sender');
-    senderSpan.textContent = `${sender}: `;
+    senderSpan.textContent = `${sender} `;
+    
 
     const messageSpan = document.createElement('span');
     messageSpan.classList.add('message-text');
@@ -183,7 +190,7 @@ function updateChatBox(sender, message) {
 
 // This function is called once the recording is finished and saved
 async function analyzeRecordingAndAskToContinue() {
-    updateChatBox('System', 'Analyzing the recording...');
+    updateChatBox('Bot', 'Analyzing the recording...');
 
     // Simulate analysis delay (e.g., actual analysis logic here)
     await new Promise(resolve => setTimeout(resolve, 3000));  // Simulated analysis time
