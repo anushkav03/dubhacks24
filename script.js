@@ -25,6 +25,7 @@ async function initiateThemeConversation(themeMessage) {
     }
 }
 
+
 // Function to fetch prompts from LLM
 async function fetchPromptsFromLLM(themeMessage) {
     try {
@@ -219,12 +220,14 @@ async function analyzeRecordingAndAskToContinue() {
 }
 
 // This function is called when the user selects "Yes" to continue
+// This function is called when the user selects "Yes" to continue
 async function handleContinueWithPreviousLLMMessage() {
-    const previousLLMMessage = getPreviousLLMMessage();  // Retrieve the previous LLM message
-    let prompt = `Here is an initial story: ${previousLLMMessage}, continue generating this story line.`;
-    updateChatBox('System', 'Generating new message based on the previous message...');
+    updateChatBox('System', 'Generating new message based on the previous conversation...');
 
-    // Send the previous message to the backend to generate the next response
+    const previousLLMMessage = getPreviousLLMMessage();
+    let prompt = `Here is an initial story: ${previousLLMMessage}, continue generating this story line.`;
+
+    // Fetch new continuation from the LLM
     try {
         const response = await fetch('http://127.0.0.1:8000/generateParagraph', {
             method: 'POST',
@@ -239,13 +242,19 @@ async function handleContinueWithPreviousLLMMessage() {
         }
 
         const data = await response.json();
-
-        // Display the 'paragraph' field in the chatbox
+        
         if (data.paragraph) {
-            updateChatBox('Bot', data.paragraph);  // Display the generated paragraph
-            last_message = data.paragraph
+            updateChatBox('Bot', data.paragraph);
+            last_message = data.paragraph;  // Update the last message
+            
+            // Show recording button after generating the new paragraph
+            const recordButton = document.createElement('button');
+            recordButton.textContent = "Start Recording";
+            recordButton.classList.add('record-button');
+            recordButton.onclick = startRecording;
+            chatBox.appendChild(recordButton);
         } else {
-            updateChatBox('System', 'No paragraph generated.');  // Handle missing paragraph case
+            updateChatBox('System', 'No new paragraph generated.');
         }
     } catch (error) {
         console.error('Error generating new message:', error);
@@ -254,12 +263,11 @@ async function handleContinueWithPreviousLLMMessage() {
 }
 
 
+
 function getPreviousLLMMessage() {
     // Logic to retrieve the previous LLM message before recording
     return last_message;
 }
-
-
 
 
 // Event listeners for theme selection
@@ -311,4 +319,3 @@ sendMessageButton.addEventListener('click', async () => {
         messageInput.value = '';
     }
 });
-
