@@ -6,6 +6,8 @@ const sendMessageButton = document.getElementById('send-btn');
 const promptSelectionDiv = document.getElementById('prompt-selection');
 const promptButtonsDiv = document.getElementById('prompt-buttons');
 const chatBox = document.getElementById('chat-box');
+var last_message = null;
+
 
 // Keep track of the theme initiation
 let themeInitiated = false;
@@ -92,19 +94,20 @@ async function fetchParagraphFromLLM(selectedPrompt) {
             },
             body: JSON.stringify({ prompt: selectedPrompt })
         });
+        
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
 
         const data = await response.json();
+        last_message = data.paragraph
         return data.paragraph;  // Assuming the API returns a "paragraph" field
     } catch (error) {
         console.error('Error fetching paragraph from LLM:', error);
         return 'Error generating paragraph. Please try again later.';  // Default error message
     }
 }
-
 function startRecording() {
     navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
         const recorder = new MediaRecorder(stream);
@@ -120,6 +123,7 @@ function startRecording() {
             const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
             const audioUrl = URL.createObjectURL(audioBlob);
             saveAudioFile(audioBlob);
+            analyzeRecordingAndAskToContinue();  // Start analysis after recording is saved
         };
 
         // Start the recording
@@ -143,12 +147,6 @@ function startRecording() {
     });
 }
 
-function stopRecording() {
-    if (recorder) {
-        recorder.stop();
-    }
-}
-
 function saveAudioFile(blob) {
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -156,19 +154,6 @@ function saveAudioFile(blob) {
     link.click();
 }
 
-// Event listeners for theme selection
-darkModeToggle.addEventListener('click', () => {
-    document.body.classList.add('darkmode');
-    initiateThemeConversation("You've entered a mysterious theme!");
-});
-
-removedarkMode.addEventListener('click', () => {
-    document.body.classList.remove('darkmode');
-    initiateThemeConversation("You're in a light-hearted theme!");
-});
-
-// Update chatbox function to add user and bot messages
-// Update chatbox function to add user and bot messages
 function updateChatBox(sender, message) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message');
@@ -193,6 +178,104 @@ function updateChatBox(sender, message) {
     chatBox.appendChild(messageDiv);
     chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the bottom
 }
+
+
+// This function is called once the recording is finished and saved
+async function analyzeRecordingAndAskToContinue() {
+    updateChatBox('System', 'Analyzing the recording...');
+
+    // Simulate analysis delay (e.g., actual analysis logic here)
+    await new Promise(resolve => setTimeout(resolve, 3000));  // Simulated analysis time
+
+    // Once the analysis is done, give the option to continue
+    const continueDiv = document.createElement('div');
+    continueDiv.classList.add('continue-options');
+
+    const messageSpan = document.createElement('span');
+    messageSpan.textContent = "Do you want to continue?";
+
+    const yesButton = document.createElement('button');
+    yesButton.textContent = "Yes";
+    yesButton.classList.add('continue-button');
+    yesButton.onclick = async () => {
+        updateChatBox('User', ': Yes');
+        await handleContinueWithPreviousLLMMessage();  // Handle continuation
+        continueDiv.remove();  // Remove the prompt after user selection
+    };
+
+    const noButton = document.createElement('button');
+    noButton.textContent = "No";
+    noButton.classList.add('continue-button');
+    noButton.onclick = () => {
+        updateChatBox('User', ': No');
+        updateChatBox('System', 'Conversation ended.');  // Handle ending the conversation
+        continueDiv.remove();  // Remove the prompt after user selection
+    };
+
+    continueDiv.appendChild(messageSpan);
+    continueDiv.appendChild(yesButton);
+    continueDiv.appendChild(noButton);
+    chatBox.appendChild(continueDiv);  // Display in chat box
+}
+
+// This function is called when the user selects "Yes" to continue
+async function handleContinueWithPreviousLLMMessage() {
+    const previousLLMMessage = getPreviousLLMMessage();  // Retrieve the previous LLM message
+    let prompt = `Here is an initial story: ${previousLLMMessage}, continue generating this story line.`;
+    updateChatBox('System', 'Generating new message based on the previous message...');
+
+    // Send the previous message to the backend to generate the next response
+    try {
+        const response = await fetch('http://127.0.0.1:8000/generateParagraph', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt: prompt })
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+
+        // Display the 'paragraph' field in the chatbox
+        if (data.paragraph) {
+            updateChatBox('Bot', data.paragraph);  // Display the generated paragraph
+            last_message = data.paragraph
+        } else {
+            updateChatBox('System', 'No paragraph generated.');  // Handle missing paragraph case
+        }
+    } catch (error) {
+        console.error('Error generating new message:', error);
+        updateChatBox('System', 'Error generating new message. Please try again.');
+    }
+}
+
+
+function getPreviousLLMMessage() {
+    // Logic to retrieve the previous LLM message before recording
+    return last_message;
+}
+
+
+
+
+// Event listeners for theme selection
+darkModeToggle.addEventListener('click', () => {
+    document.body.classList.add('darkmode');
+    initiateThemeConversation("You've entered a mysterious theme!");
+});
+
+removedarkMode.addEventListener('click', () => {
+    document.body.classList.remove('darkmode');
+    initiateThemeConversation("You're in a light-hearted theme!");
+});
+
+// Update chatbox function to add user and bot messages
+// Update chatbox function to add user and bot messages
+
 
 sendMessageButton.addEventListener('click', async () => {
     const userMessage = messageInput.value.trim();  // Get the user input and trim any extra spaces
@@ -228,5 +311,4 @@ sendMessageButton.addEventListener('click', async () => {
         messageInput.value = '';
     }
 });
-
 
