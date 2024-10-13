@@ -47,17 +47,17 @@ def silent_pauses(audio, threshold=1000):
     return silent_durations
 
 
-print(silent_pauses(audio))
+#print(silent_pauses(audio))
 
-words, time, wpm = speechrate(transcript, path)
+#words, time, wpm = speechrate(transcript, path)
 
-count, filler_times = filler_pauses(transcript)
-print("count: ", count, " filler_times: ", filler_times)
+#count, filler_times = filler_pauses(transcript)
+#print("count: ", count, " filler_times: ", filler_times)
 
-print(f"words: {words}")
-print(transcript)
-print(f"num words: {len(words)}")
-print(f"time: {time}")
-print(f"wpm: {wpm}")
+#print(f"words: {words}")
+#print(transcript)
+#print(f"num words: {len(words)}")
+#print(f"time: {time}")
+#print(f"wpm: {wpm}")
     
 ## Trying CrisperWhisper

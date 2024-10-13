@@ -7,5 +7,3 @@ pip install pydub
 
 pip install git+https://github.com/openai/whisper.git
 
-
-

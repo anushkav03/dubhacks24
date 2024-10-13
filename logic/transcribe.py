@@ -1,7 +1,7 @@
 import whisper
 from pydub import AudioSegment
 
-path = "../tests/batmanSpeech.wav"
+path = "../tests/repeatSpeech.wav"
 
 ## Getting transcript and audio
 audio = AudioSegment.from_wav(path)
