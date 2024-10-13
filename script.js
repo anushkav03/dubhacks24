@@ -217,6 +217,15 @@ async function analyzeRecordingAndAskToContinue() {
     noButton.onclick = () => {
         updateChatBox('User', ': No');
         updateChatBox('System', 'Conversation ended.');  // Handle ending the conversation
+        const modal = document.getElementById('statsModal');
+        modal.style.display = 'block';
+        const closeButton = document.querySelector('.close');
+
+        // Function to close the modal
+        closeButton.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+
         continueDiv.remove();  // Remove the prompt after user selection
     };
 
