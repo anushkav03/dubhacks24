@@ -2,7 +2,7 @@ import shutil
 import os
 
 # Specify the source folder and destination folder
-source_folder = '/Users/mishtu/Downloads'
+source_folder = '/Users/adityaiyer/Downloads'
 destination_folder = "tests"
 
 # Get a list of all files in the source folder

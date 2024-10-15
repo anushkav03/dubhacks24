@@ -60,7 +60,7 @@ async def generate_paragraph(request: PromptInput):
     prompt = request.prompt
 
     try:
-        paragraph_request = f"Write a detailed paragraph based on the following prompt: {prompt}."
+        paragraph_request = f"Write a detailed paragraph based on the following prompt: {prompt}. Ensure your generated prompt is 50 words MAX."
         conversation_history = []
         response = chatbot_with_memory(conversation_history, paragraph_request)
         generated_paragraph = response[0]
